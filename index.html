@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en" ng-app="PassHuman">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Foundation Angular</title>
+		<link href="styles/css/styles.css" rel="stylesheet" type="text/css">
+		<script type="text/javascript" src="bower_components/angular/angular.min.js"></script>
+		<script type="text/javascript" src="bower_components/jquery/dist/jquery.min.js"></script>
+
+		<script type="text/javascript" src="scripts/controllers.js"></script>
+		<script type="text/javascript" src="scripts/animations.js"></script>
+		<script type="text/javascript" src="scripts/app.js"></script>
+	</head>
+	<body>
+		<div ng-controller="PanelsCtrl">
+			<div class="panel panel-top add-password-group" ng-class="panels.addPasswordGroup" >
+				<div class="align-center grid-block">
+					<div class="grid-block medium-8 large-4">
+						<div class="grid-content">
+							<h4>Add Password Group</h4>
+							<form>
+								<label>
+									Password Group Name
+									<input type="text" placeholder="eg. Work Passwords" ng-model="group.name">
+								</label>
+								<label>
+									Path to File
+									<input type="text" placeholder="eg. ~/Dropbox/PassHuman/work.ph" ng-model="group.path">
+									<p>This file does not exist yet. PassHuman will create it for you.</p>
+									<p>{{ group.path }}</p>
+								</label>
+								<label>
+									Password
+									<span class="inline-label">
+										<input type="text" ng-model="group.password">
+										<a href="#" class="button">Generate</a>
+									</span>
+									<a href="#">Show Password</a>
+								</label>
+								<a href="#" class="button add-button">Add Password Group</a>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="grid-frame">
+			<div zf-panel position="left" id="sidebar" class="medium-grid-block collapse medium-3 large-3 vertical">
+				<div class="grid-content collapse shrink hide-for-medium">
+					<a href="" class="secondary button expand" zf-close>Close</a>
+				</div>
+				<div class="grid-content collapse shrink">
+					<img src="http://placehold.it/400x150&text=Logo">
+				</div>
+				<div class="grid-content">
+					
+					<section class="block-list">
+						<header>Password Groups</header>
+						<ul>
+							<li>
+								<a href="#">
+									Slam Book
+									<span class="block-list-label">7</span>
+								</a>
+							</li>
+						</ul>
+					</section>
+				</div>
+				<div class="grid-content collapse shrink avatar-section" ng-controller="LeftFooterCtrl">
+					<ul class="icon-top primary menu-bar">
+						<li><a href="#" ng-click="togglePanel('settings')"><div class="ion-ios-gear"></div> Settings</a></li>
+						<li><a href="#" ng-click="togglePanel('addPasswordGroup')"><div class="ion-plus-round"></div> Password Group</a></li>
+						<li><a href="#"><div class="ion-code"></div> Dev Tools</a></li>
+					</ul>
+				</div>
+			</div>
+
+			<div class="grid-block collapse medium-9 large-9 vertical">
+				<div class="grid-block">
+					<div class="grid-block small-12 medium-12 vertical">
+						<div class="grid-content">
+							<h4><img src="http://placehold.it/30x30"> Cady Heron</h4>
+							<p>Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat nisl ut dapibus. Mauris iaculis porttitor posuere. Praesent id metus massa, ut blandit odio. Proin quis tortor orci. Etiam at risus et justo dignissim congue.</p>
+							<hr />
+							<h4><img src="http://placehold.it/30x30"> Kevin Gnapoor</h4>
+							<p>Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat.</p>
+							<hr />
+							<h4><img src="http://placehold.it/30x30"> Cady Heron</h4>
+							<p>Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat.</p>
+							<hr />
+							<h4><img src="http://placehold.it/30x30"> Trang Pak</h4>
+							<p>Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat.</p>
+							<hr />
+							<h4><img src="http://placehold.it/30x30"> Coach Carr</h4>
+							<p>Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat.</p>
+							<hr />
+							<h4><img src="http://placehold.it/30x30"> Cady Heron</h4>
+							<p>Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat.</p>
+							<hr />
+							<h4><img src="http://placehold.it/30x30"> Trang Pak</h4>
+							<p>Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat.</p>
+							<hr />
+							<h4><img src="http://placehold.it/30x30"> Cady Heron</h4>
+							<p>Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat.</p>
+							<hr />
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

@@ -1,0 +1,32 @@
+@import '../../bower_components/foundation-apps/scss/foundation';
+
+$ionicons-font-path: '../../bower_components/ionicons/fonts';
+@import '../../bower_components/ionicons/scss/ionicons';
+
+
+.message-input, .message-input .inline-label, .menu-bar {margin-bottom: 0;}
+#sidebar, .messages {border-right: 1px solid #eee;}
+.message-side-bar {border-left: 1px solid #eee;}
+.avatar-section {border-top: 1px solid #eee;}
+
+.menu-bar > li > a > div {
+	font-size: 2em;
+	margin-bottom: 0.2em;
+}
+
+.panel {
+	display: block;
+	top: -300px;
+	transition-property: top;
+	transition-duration: 0.3s;
+	transition-delay: 0s;
+}
+
+.panel.is-active {
+	top: 0;
+}
+
+.add-password-group {
+	height: 400px;
+	top: -400px;
+}
