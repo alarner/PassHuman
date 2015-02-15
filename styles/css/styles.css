@@ -8083,6 +8083,12 @@ blockquote p {
 .ion-xbox:before {
   content: ""; }
 
+.alert {
+  color: #F04124; }
+
+.success {
+  color: #43AC6A; }
+
 .message-input, .message-input .inline-label, .menu-bar {
   margin-bottom: 0; }
 
@@ -8112,5 +8118,20 @@ blockquote p {
 .add-password-group {
   height: 400px;
   top: -400px; }
+
+#password-form {
+  position: fixed;
+  top: 40%; }
+  #password-form .extra-large, #password-form .ion-lock-combination {
+    font-size: 30px;
+    padding: 16px; }
+  #password-form .password {
+    font-size: 30px;
+    text-align: center; }
+  #password-form .alert {
+    font-size: 20px; }
+
+#register-form {
+  overflow: hidden; }
 
 /*# sourceMappingURL=styles.css.map */

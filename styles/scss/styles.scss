@@ -4,6 +4,14 @@ $ionicons-font-path: '../../bower_components/ionicons/fonts';
 @import '../../bower_components/ionicons/scss/ionicons';
 
 
+.alert {
+	color: $alert-color;
+}
+
+.success {
+	color: $success-color;
+}
+
 .message-input, .message-input .inline-label, .menu-bar {margin-bottom: 0;}
 #sidebar, .messages {border-right: 1px solid #eee;}
 .message-side-bar {border-left: 1px solid #eee;}
@@ -29,4 +37,27 @@ $ionicons-font-path: '../../bower_components/ionicons/fonts';
 .add-password-group {
 	height: 400px;
 	top: -400px;
+}
+
+#password-form {
+	position: fixed;
+	top: 40%;
+
+	.extra-large, .ion-lock-combination {
+		font-size: 30px;
+		padding: 16px;
+	}
+
+	.password {
+		font-size: 30px;
+		text-align: center;
+	}
+
+	.alert {
+		font-size: 20px;
+	}
+}
+
+#register-form {
+	overflow: hidden;
 }
