@@ -15,7 +15,7 @@
 		<script type="text/javascript" src="scripts/app.js"></script>
 	</head>
 	<body ng-controller="PassHumanCtrl">
-		<div class="grid-block" ng-show="page === 'private'">
+		<div class="grid-block ng-hide" ng-show="page === 'private'">
 			<div ng-controller="PanelsCtrl">
 				<div class="panel panel-top add-password-group" ng-class="panels.addPasswordGroup" ng-controller="AddPasswordGroupCtrl">
 					<div class="align-center grid-block">
@@ -138,7 +138,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="grid-block align-center" ng-show="page === 'login'" ng-controller="LoginCtrl">
+		<div class="grid-block align-center ng-hide" ng-show="page === 'login'" ng-controller="LoginCtrl">
 			<div class="grid-block medium-9">
 				<div class="grid-content">
 					<form ng-submit="login(credentials)">
@@ -147,7 +147,7 @@
 								<span class="form-label">
 									<span class="ion-lock-combination"></span>
 								</span>
-								<input type="password" class="password" ng-model="credentials.password">
+								<input type="password" class="password" id="login-password" ng-model="credentials.password" autofocus>
 								<a href="#" class="button extra-large" ng-class="loading ? 'disabled' : ''">Unlock</a>
 							</span>
 							<p class="alert" ng-show="error" ng-bind="error"></p>
@@ -156,7 +156,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="grid-block align-center" ng-show="page === 'register'" ng-controller="RegisterCtrl">
+		<div class="grid-block align-center ng-hide" ng-show="page === 'register'" ng-controller="RegisterCtrl">
 			<div class="grid-block medium-9">
 				<div class="grid-content" id="register-form">
 					<h3>Set up PassHuman</h3>

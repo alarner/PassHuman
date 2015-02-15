@@ -3,42 +3,97 @@ angular.module('PassHuman.services', [])
 	return process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
 })
 .factory('PasswordGroup', function(Home) {
-	return function() {
-		var fs = require('fs');
+	return function(obj) {
+		var fs = require('fs-extra');
 		var crypto = require('crypto');
 		var path = require('path');
-		var passwords = [];
-
-		this.save = function() {
-
+		var self = this;
+		var errors = {
+			NOPATH: {code: 'NOPATH', message: 'Missing path.'},
+			NONAME: {code: 'NONAME', message: 'Missing name.'},
+			NOPASS: {code: 'NOPASS', message: 'Missing password.'},
+			NOCIPHER: {code: 'NOCIPHER', message: 'Missing cipher.'},
+			BADPARSE: {code: 'BADPARSE', message: 'Unable to parse the file.'},
+			DECRYPT: {code: 'DECRYPT', message: 'Unable to decrypt the file.'},
+			ENCRYPT: {code: 'ENCRYPT', message: 'Unable to encrypt the file.'},
+			BADPATH: {code: 'BADPATH', message: 'There was a problem trying to read the file.'},
+			ENOENT: {code: 'ENOENT', message: 'The file doesn\'t exist.'},
+			EISDIR: {code: 'EISDIR', message: 'The path points to a directory.'}
 		};
 
-		this.load = function(file, algorithm, password, cb) {
-			if(file.charAt(0) === '~') {
-				file = path.join(Home, file.substr(1));
-			}
-			var r = fs.createReadStream(path.resolve(file));
-			// decrypt content
-			var decrypt = crypto.createDecipher(algorithm, password)
-			// start pipe
-			r.pipe(decrypt);
+		var settings = _.cloneDeep(obj);
+		var passwords = [];
+		if(_.isArray(settings.passwords)) {
+			passwords = settings.passwords;
+		}
+		if(settings.path && settings.path.charAt(0) === '~') {
+			settings.path = path.join(Home, settings.path.substr(1));
+		}
 
-			r.on('error', function(err) {
-				cb({
-					type: 'read',
-					err: err
-				});
+		this.getPath = function() {
+			return settings.path;
+		};
+
+		this.validate = function() {
+			if(!settings.path) return errors.NOPATH;
+			if(!settings.cipher) return errors.NOCIPHER;
+			if(!settings.name) return errors.NONAME;
+			if(!settings.password) return errors.NOPASS;
+			return false;
+		};
+
+		this.save = function(cb) {
+			var err = self.validate();
+			if(err) return cb(err);
+
+			fs.ensureFile(settings.path, function(err) {
+				if(err) return cb(err);
+
+				try {
+					var cipher = crypto.createCipher(settings.cipher, settings.password);
+					var crypted = cipher.update(JSON.stringify({
+						passwords: passwords
+					}),'utf8','hex');
+					crypted += cipher.final('hex');
+
+					fs.writeFile(settings.path, crypted, cb);
+				}
+				catch(e) {
+					console.log(e);
+					cb(errors.ENCRYPT);
+				}
 			});
+		};
 
-			decrypt.on('error', function(err) {
-				cb({
-					type: 'decrypt',
-					err: err
-				});
-			});
+		this.load = function(cb) {
+			if(!settings.path) return cb(errors.NOPATH);
+			if(!settings.cipher) return cb(errors.NOCIPHER);
 
-			decrypt.on('end', function() {
-				console.log(decrypt);
+			fs.readFile(settings.path, function(err, data) {
+				console.log('read file', settings.path);
+				if(err) {
+					if(err.code == 'ENOENT') {
+						return cb(errors.ENOENT);
+					}
+					else if(err.code == 'EISDIR') {
+						return cb(errors.EISDIR);
+					}
+					else {
+						return cb(errors.BADPATH);
+					}
+				}
+				var decipher = crypto.createDecipher(settings.cipher, settings.password || '');
+				try {
+					var dec = decipher.update(data.toString(),'hex','utf8');
+					dec += decipher.final('utf8');
+					var result = JSON.parse(dec);
+					if(!result) return cb(errors.BADPARSE);
+					passwords = result.passwords;
+					cb();
+				}
+				catch(e) {
+					return cb(errors.DECRYPT);
+				}
 			});
 		};
 	}
@@ -46,7 +101,6 @@ angular.module('PassHuman.services', [])
 .factory('PasswordGenerator', function() {
 	return {
 		generate: function(len, chars) {
-			console.log('generate');
 			if(!len) throw 'A length is required.';
 			if(!_.isNumber(len)) throw 'The length must be a number.';
 			
@@ -56,7 +110,6 @@ angular.module('PassHuman.services', [])
 					var index = Math.floor(Math.random()*chars.length);
 					if(index == chars.length) index = chars.length-1;
 					generatedPass += chars.charAt(index);
-					console.log(chars);
 				}
 				else {
 					var rand = Math.floor(Math.random()*95);
@@ -114,7 +167,6 @@ angular.module('PassHuman.services', [])
 	var self = this;
 
 	this.load = function(cb) {
-		console.log('load');
 		var file = getFile(cb);
 		if(!file) return;
 
@@ -132,26 +184,9 @@ angular.module('PassHuman.services', [])
 				cb(e);
 			}
 		});
-		
-
-		// var r = fs.createReadStream(path.resolve(file));
-		// // decrypt content
-		// var decrypt = crypto.createDecipher(Public.settings.cipher, pass)
-		// // start pipe
-		// r.pipe(decrypt);
-
-		// r.on('error', cb);
-		// decrypt.on('error', cb);
-		// decrypt.on('end', function() {
-		// 	settings = JSON.parse(decrypt);
-		// 	if(!settings) return cb({message: 'Unable to parse .lookup.json'});
-		// 	console.log(settings);
-		// 	cb();
-		// });
 	};
 
 	this.save = function(cb) {;
-		console.log('save')
 		var file = getFile(cb);
 		if(!file) return;
 

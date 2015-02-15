@@ -9,7 +9,9 @@
   "window": {
     "toolbar": false,
     "width": 800,
-    "height": 600
+    "height": 600,
+    "min_width": 740,
+    "min_height": 600
   },
   "author": "",
   "license": "ISC",

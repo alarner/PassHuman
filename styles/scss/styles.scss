@@ -3,7 +3,6 @@
 $ionicons-font-path: '../../bower_components/ionicons/fonts';
 @import '../../bower_components/ionicons/scss/ionicons';
 
-
 .alert {
 	color: $alert-color;
 }
@@ -37,6 +36,14 @@ $ionicons-font-path: '../../bower_components/ionicons/fonts';
 .add-password-group {
 	height: 400px;
 	top: -400px;
+}
+.menu-bar {
+	li {
+		a {
+			font-size: 0.7rem;
+			padding: 0.7rem;
+		}
+	}
 }
 
 #password-form {

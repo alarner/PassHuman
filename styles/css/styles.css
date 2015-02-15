@@ -8119,6 +8119,10 @@ blockquote p {
   height: 400px;
   top: -400px; }
 
+.menu-bar li a {
+  font-size: 0.7rem;
+  padding: 0.7rem; }
+
 #password-form {
   position: fixed;
   top: 40%; }

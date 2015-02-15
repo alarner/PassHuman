@@ -4,11 +4,17 @@ angular.module('PassHuman.controllers', ['PassHuman.services'])
 	if(!Public.settings) {
 		$scope.page = 'register';
 	}
+	else {
+		console.log('focus');
+		console.log($('#login-password'));
+		$('#login-password').focus();
+	}
 	$scope.error = Public.error;
 
-	$rootScope.$on('login', function() {
+	$rootScope.$on('LOGIN', function() {
 		$scope.page = 'private';
 	});
+
 })
 .controller('RegisterCtrl', function($scope, $rootScope, Home, Public, Private) {
 	var path = require('path');
@@ -69,7 +75,7 @@ angular.module('PassHuman.controllers', ['PassHuman.services'])
 				$scope.$apply();
 			}
 			else {
-				$rootScope.$emit('login');
+				$rootScope.$emit('LOGIN');
 			}
 		});
 	};
@@ -91,15 +97,15 @@ angular.module('PassHuman.controllers', ['PassHuman.services'])
 				$scope.error = err.message;
 			}
 			else {
-				$rootScope.$emit('login');
+				$rootScope.$emit('LOGIN');
 			}
 			$scope.$apply();
 		});
 	};
 })
-.controller('AddPasswordGroupCtrl', function($scope, PasswordGroup, PasswordGenerator) {
+.controller('AddPasswordGroupCtrl', function($scope, $rootScope, PasswordGroup, PasswordGenerator) {
 	var fs = require('fs');
-	var passGroup = new PasswordGroup();
+	// var passGroup = new PasswordGroup();
 	$scope.group = {
 		name: '',
 		path: '',
@@ -126,41 +132,122 @@ angular.module('PassHuman.controllers', ['PassHuman.services'])
 			return $scope.error = 'Enter a path where this password group will be saved.';
 		if(!group.cipher)
 			return $scope.error = 'Enter a cipher that will be used to encrypt your passwords. If you\'re not sure you can pick aes256.';
-		
+
+		var passGroup = new PasswordGroup($scope.group);
+
 		$scope.saving = true;
 
-
+		async.waterfall([
+			function(cb) {
+				fs.access(passGroup.getPath(), fs.F_OK, function(err) {
+					console.log('fs.access', arguments);
+					if(err && err.code === 'ENOENT') {
+						return cb(null, false);
+					}
+					else if(err) {
+						return cb(err);
+					}
+					else {
+						return cb(null, true);
+					}
+				});
+			},
+			function(fileExists, cb) {
+				console.log('fileExists', fileExists);
+				if(!fileExists) return cb(null, fileExists);
+				passGroup.load(function(err) {
+					if(!err) return cb(null, fileExists);
+					switch(err.code) {
+						case 'NOPATH':
+						case 'NOCIPHER':
+						case 'ENOENT':
+						case 'BADPATH':
+							$scope.error = err.message;
+						break;
+						case 'EISDIR':
+							$scope.error = 'The path points to a directory. '+
+							'Please pick a file instead';
+						break;
+						case 'BADPARSE':
+						case 'DECRYPT':
+							$scope.error = 'The password you entered did not '+
+							'decrypt the pre-existing file at: '+group.path+
+							'. Please try a different password or cipher.';
+						break;
+						default:
+							$scope.error = err.code;
+						break;
+					}
+					cb(err, fileExists);
+				});
+			}
+			,
+			function(fileExists, cb) {
+				if(fileExists)  return cb(null, fileExists);
+				passGroup.save(function(err) {
+					if(!err) return cb(null, fileExists);
+					switch(err.code) {
+						case 'NOPATH':
+						case 'NOCIPHER':
+						case 'ENOENT':
+						case 'NONAME':
+						case 'NOPASS':
+						case 'BADPATH':
+						case 'ENCRYPT':
+							$scope.error = err.message;
+						break;
+						default:
+							$scope.error = err.code;
+						break;
+					}
+					cb(err, fileExists);
+				});
+			}
+		], function(err) {
+			$scope.saving = false;
+			$scope.$apply();
+			if(!err) {
+				$rootScope.$emit(
+					'SET_PANEL_VISIBILITY',
+					{name: 'addPasswordGroup', visible: false}
+				);
+			}
+		});
 	};
 	$scope.$watch('group.path', function() {
 		if(!$scope.group.path) {
 			$scope.pathMessage = '';
 		}
 		else {
-			passGroup.load($scope.group.path, $scope.group.cipher, $scope.group.password, function(err) {
+			var passGroup = new PasswordGroup($scope.group);
+			passGroup.load(function(err) {
+				console.log(err.code);
 				$scope.pathMessageClass = 'success';
 				if(err) {
-					if(err.type == 'read') {
-						err = err.err;
-						if(err.code == 'ENOENT') {
-							$scope.pathMessage = 'The specified password group file \
-							does not exist. PassHuman will create a new file for you.';
-						}
-						else if(err.code == 'EISDIR') {
-							$scope.pathMessage = 'The specified password group file \
-							points to a directory. Please choose a file instead.';
+					switch(err.code) {
+						case 'NOPATH':
+							$scope.pathMessage = '';
+						break;
+						case 'ENOENT':
+							$scope.pathMessage = 'The specified password group file '+
+							'does not exist. PassHuman will create a new file for you.';
+						break;
+						case 'EISDIR':
+							$scope.pathMessage = 'The path points to a directory. '+
+							'Please pick a file instead';
 							$scope.pathMessageClass = 'alert';
-						}
-						else {
-							$scope.pathMessage = 'An unkown error occurred.';
+						break;
+						case 'BADPATH':
+							$scope.pathMessage = 'There was a problem loading that '+
+							'particular file. Does it have the correct permissions?';
 							$scope.pathMessageClass = 'alert';
-						};
-					}
-					else if(err.type == 'decrypt') {
-						err = err.err;
-						$scope.pathMessage = 'The specified password group file \
-						exists, but there was a problem decrypting it with the \
-						specified password: '+err.message;
-						$scope.pathMessageClass = 'alert';
+						break;
+						case 'NOCIPHER':
+						case 'BADPARSE':
+						case 'DECRYPT':
+							$scope.pathMessage = 'The specified password group file '+
+							'exists. PassHuman will use the existing file.';
+						break;
 					}
 				}
 				else {
@@ -189,5 +276,13 @@ angular.module('PassHuman.controllers', ['PassHuman.services'])
 		if(!$scope.panels.hasOwnProperty(panelName)) return;
 		$scope.panels[panelName] = $scope.panels[panelName] ? '' : 'is-active';
 		console.log($scope.panels[panelName]);
+		$scope.$apply();
+	});
+
+	$rootScope.$on('SET_PANEL_VISIBILITY', function(e, obj) {
+		console.log('SET_PANEL_VISIBILITY')
+		if(!$scope.panels.hasOwnProperty(obj.name)) return;
+		$scope.panels[obj.name] = obj.visible ? 'is-active' : '';
+		$scope.$apply();
 	});
 });
