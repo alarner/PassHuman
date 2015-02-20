@@ -3,5 +3,5 @@ angular.module('PassHuman', [
 	'PassHuman.services'
 ])
 .run(function(Public) {
-
+	// require('nw.gui').Window.get().showDevTools();
 });

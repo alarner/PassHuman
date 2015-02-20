@@ -78,18 +78,18 @@
 					<div class="grid-content collapse shrink hide-for-medium">
 						<a href="" class="secondary button expand" zf-close>Close</a>
 					</div>
-					<div class="grid-content collapse shrink">
+					<!-- <div class="grid-content collapse shrink">
 						<img src="http://placehold.it/400x150&text=Logo">
-					</div>
+					</div> -->
 					<div class="grid-content">
 						
 						<section class="block-list">
 							<header>Password Groups</header>
 							<ul>
-								<li>
+								<li ng-repeat="group in groups track by $index">
 									<a href="#">
-										Slam Book
-										<span class="block-list-label">7</span>
+										<div>{{ group.name }}</div>
+										<div class="group-path" ng-bind="group.path"></div>
 									</a>
 								</li>
 							</ul>

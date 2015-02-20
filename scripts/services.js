@@ -34,6 +34,10 @@ angular.module('PassHuman.services', [])
 			return settings.path;
 		};
 
+		this.getSettings = function() {
+			return settings;
+		};
+
 		this.validate = function() {
 			if(!settings.path) return errors.NOPATH;
 			if(!settings.cipher) return errors.NOCIPHER;
@@ -158,7 +162,7 @@ angular.module('PassHuman.services', [])
 		});
 	};
 })
-.service('Private', function(Public) {
+.service('Private', function($rootScope, Public) {
 	var fs = require('fs-extra');
 	var path = require('path');
 	var crypto = require('crypto');
@@ -178,6 +182,7 @@ angular.module('PassHuman.services', [])
 				dec += decipher.final('utf8');
 				settings = JSON.parse(dec);
 				if(!settings) return cb({message: 'Unable to parse .lookup.json'});
+				$rootScope.$emit('PRIVATE.LOAD');
 				cb();
 			}
 			catch(e) {
@@ -201,8 +206,21 @@ angular.module('PassHuman.services', [])
 		});
 	};
 
+	this.getGroups = function() {
+		return settings.groups;
+	};
+
 	this.setPassword = function(p) {
 		pass = p;
+	};
+
+	this.addGroup = function(group, cb) {
+		settings.groups.push(group);
+		this.save(function(err) {
+			if(err) return cb(err);
+			$rootScope.$emit('PRIVATE.CHANGE');
+			cb();
+		});
 	};
 
 	var getFile = function(cb) {

@@ -1,5 +1,5 @@
 angular.module('PassHuman.controllers', ['PassHuman.services'])
-.controller('PassHumanCtrl', function($scope, $rootScope, Public) {
+.controller('PassHumanCtrl', function($scope, $rootScope, Public, Private) {
 	$scope.page = 'login';
 	if(!Public.settings) {
 		$scope.page = 'register';
@@ -12,7 +12,22 @@ angular.module('PassHuman.controllers', ['PassHuman.services'])
 	$scope.error = Public.error;
 
 	$rootScope.$on('LOGIN', function() {
+		console.log('on LOGIN');
 		$scope.page = 'private';
+		$scope.$apply();
+	});
+
+	$rootScope.$on('PRIVATE.LOAD', function() {
+		console.log('PRIVATE.LOAD');
+		$scope.groups = Private.getGroups();
+		console.log($scope.groups);
+		$scope.$apply();
+	});
+
+	$rootScope.$on('PRIVATE.CHANGE', function() {
+		console.log('PRIVATE.CHANGE');
+		$scope.groups = Private.getGroups();
+		$scope.$apply();
 	});
 
 })
@@ -48,6 +63,7 @@ angular.module('PassHuman.controllers', ['PassHuman.services'])
 
 		async.series([
 			function(cb) {
+				console.log(1);
 				Public.save(rd.path, function(err) {
 					if(err) {
 						$scope.error = err.message;
@@ -60,6 +76,7 @@ angular.module('PassHuman.controllers', ['PassHuman.services'])
 				});
 			},
 			function(cb) {
+				console.log(2);
 				Private.setPassword(rd.password);
 				Private.load(function(err) {
 					if(err.code !== 'ENOENT') return cb(err);
@@ -67,14 +84,18 @@ angular.module('PassHuman.controllers', ['PassHuman.services'])
 				});
 			},
 			function(cb) {
+				console.log(3);
 				Private.save(cb);
 			}
 		], function(err) {
+			console.log(4);
 			if(err) {
+				console.log(err);
 				$scope.error = err.message;
 				$scope.$apply();
 			}
 			else {
+				console.log('LOGIN!');
 				$rootScope.$emit('LOGIN');
 			}
 		});
@@ -103,7 +124,7 @@ angular.module('PassHuman.controllers', ['PassHuman.services'])
 		});
 	};
 })
-.controller('AddPasswordGroupCtrl', function($scope, $rootScope, PasswordGroup, PasswordGenerator) {
+.controller('AddPasswordGroupCtrl', function($scope, $rootScope, PasswordGroup, PasswordGenerator, Private) {
 	var fs = require('fs');
 	// var passGroup = new PasswordGroup();
 	$scope.group = {
@@ -153,7 +174,6 @@ angular.module('PassHuman.controllers', ['PassHuman.services'])
 				});
 			},
 			function(fileExists, cb) {
-				console.log('fileExists', fileExists);
 				if(!fileExists) return cb(null, fileExists);
 				passGroup.load(function(err) {
 					if(!err) return cb(null, fileExists);
@@ -180,8 +200,7 @@ angular.module('PassHuman.controllers', ['PassHuman.services'])
 					}
 					cb(err, fileExists);
 				});
-			}
-			,
+			},
 			function(fileExists, cb) {
 				if(fileExists)  return cb(null, fileExists);
 				passGroup.save(function(err) {
@@ -202,6 +221,9 @@ angular.module('PassHuman.controllers', ['PassHuman.services'])
 					}
 					cb(err, fileExists);
 				});
+			},
+			function(fileExists, cb) {
+				Private.addGroup(passGroup.getSettings(), cb);
 			}
 		], function(err) {
 			$scope.saving = false;

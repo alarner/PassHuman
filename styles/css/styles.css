@@ -8138,4 +8138,11 @@ blockquote p {
 #register-form {
   overflow: hidden; }
 
+.group-path {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #999;
+  font-size: 13px;
+  margin-top: 3px; }
+
 /*# sourceMappingURL=styles.css.map */
