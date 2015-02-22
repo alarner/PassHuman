@@ -38,6 +38,10 @@ angular.module('PassHuman.services', [])
 			return settings;
 		};
 
+		this.getPasswords = function() {
+			return passwords;
+		};
+
 		this.validate = function() {
 			if(!settings.path) return errors.NOPATH;
 			if(!settings.cipher) return errors.NOCIPHER;

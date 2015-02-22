@@ -8115,7 +8115,7 @@ blockquote p {
 .panel.is-active {
   top: 0; }
 
-.add-password-group {
+.add-password-group, .add-password {
   height: 400px;
   top: -400px; }
 
@@ -8144,5 +8144,8 @@ blockquote p {
   color: #999;
   font-size: 13px;
   margin-top: 3px; }
+
+#unlock-button {
+  margin: 0; }
 
 /*# sourceMappingURL=styles.css.map */

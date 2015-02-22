@@ -64,7 +64,65 @@
 					<div class="align-center grid-block">
 						<div class="grid-block medium-12 large-8">
 							<div class="grid-content">
+								<a href="#" class="button secondary" ng-click="cancel()" ng-class="saving ? 'disabled' : ''">Cancel</a>
 								<a href="#" class="button add-button" ng-click="create(group)" ng-class="saving ? 'disabled' : ''">Add Password Group</a>
+							</div>
+							<div class="grid-content">
+								<p class="alert" ng-show="error" ng-bind="error"></p>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="panel panel-top add-password" ng-class="panels.addPassword" ng-controller="AddPasswordCtrl">
+					<div class="align-center grid-block">
+						<div class="grid-block medium-12 large-8">
+							<div class="grid-content">
+								<h4>Add Password</h4>
+							</div>
+						</div>
+					</div>
+					<div class="align-center grid-block">
+						<div class="grid-block medium-6 large-4">
+							<div class="grid-content">
+								<form>
+									<label>
+										Title
+										<input type="text" placeholder="eg. Personal Email" ng-model="password.title">
+									</label>
+									<label>
+										Domain
+										<input type="url" placeholder="eg. http://accounts.google.com" ng-model="password.domain">
+									</label>
+									<label>
+										Username
+										<input type="text" placeholder="eg. Work Passwords" ng-model="password.username">
+									</label>
+									<label>
+										Password
+										<span class="inline-label">
+											<input type="text" ng-model="password.password">
+											<a href="#" class="button" ng-click="generate()">Generate</a>
+										</span>
+									</label>
+								</form>
+							</div>
+						</div>
+						<div class="grid-block medium-6 large-4">
+							<div class="grid-content">
+								<form>
+									<label>
+										Notes
+										<textarea placeholder="eg. Secret answer: puppies"></textarea>
+									</label>
+								</form>
+							</div>
+						</div>
+					</div>
+					<div class="align-center grid-block">
+						<div class="grid-block medium-12 large-8">
+							<div class="grid-content">
+								<a href="#" class="button secondary" ng-click="cancel()" ng-class="saving ? 'disabled' : ''">Cancel</a>
+								<a href="#" class="button add-button" ng-click="create(group)" ng-class="saving ? 'disabled' : ''">Save Password</a>
 							</div>
 							<div class="grid-content">
 								<p class="alert" ng-show="error" ng-bind="error"></p>
@@ -75,19 +133,12 @@
 			</div>
 			<div class="grid-frame">
 				<div zf-panel position="left" id="sidebar" class="medium-grid-block collapse medium-5 large-3 vertical">
-					<div class="grid-content collapse shrink hide-for-medium">
-						<a href="" class="secondary button expand" zf-close>Close</a>
-					</div>
-					<!-- <div class="grid-content collapse shrink">
-						<img src="http://placehold.it/400x150&text=Logo">
-					</div> -->
 					<div class="grid-content">
-						
 						<section class="block-list">
 							<header>Password Groups</header>
 							<ul>
 								<li ng-repeat="group in groups track by $index">
-									<a href="#">
+									<a href="#" ng-click="setActiveGroup(group)">
 										<div>{{ group.name }}</div>
 										<div class="group-path" ng-bind="group.path"></div>
 									</a>
@@ -104,34 +155,34 @@
 					</div>
 				</div>
 
-				<div class="grid-block collapse medium-7 large-9 vertical">
+				<div class="grid-block collapse medium-7 large-9 vertical" ng-controller="PasswordGroupCtrl">
 					<div class="grid-block">
-						<div class="grid-block small-12 medium-12 vertical">
-							<div class="grid-content">
+						<div class="grid-block small-12 medium-12 vertical" ng-show="group">
+							<div class="grid-content collapse shrink">
+								<div class="title-bar">
+									<span class="title left" ng-bind="group.name"></span>
+									<span class="right"><a href="#" ng-click="addPassword()"><span class="ion-android-add-circle"></span> Add Password</a></span>
+								</div>
+							</div>
+							<div class="grid-content" ng-show="group.passwords.length">
 								<h4><img src="http://placehold.it/30x30"> Cady Heron</h4>
 								<p>Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat nisl ut dapibus. Mauris iaculis porttitor posuere. Praesent id metus massa, ut blandit odio. Proin quis tortor orci. Etiam at risus et justo dignissim congue.</p>
 								<hr />
-								<h4><img src="http://placehold.it/30x30"> Kevin Gnapoor</h4>
-								<p>Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat.</p>
+								<h4><img src="http://placehold.it/30x30"> Cady Heron</h4>
+								<p>Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat nisl ut dapibus. Mauris iaculis porttitor posuere. Praesent id metus massa, ut blandit odio. Proin quis tortor orci. Etiam at risus et justo dignissim congue.</p>
 								<hr />
 								<h4><img src="http://placehold.it/30x30"> Cady Heron</h4>
-								<p>Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat.</p>
+								<p>Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat nisl ut dapibus. Mauris iaculis porttitor posuere. Praesent id metus massa, ut blandit odio. Proin quis tortor orci. Etiam at risus et justo dignissim congue.</p>
 								<hr />
-								<h4><img src="http://placehold.it/30x30"> Trang Pak</h4>
-								<p>Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat.</p>
-								<hr />
-								<h4><img src="http://placehold.it/30x30"> Coach Carr</h4>
-								<p>Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat.</p>
-								<hr />
-								<h4><img src="http://placehold.it/30x30"> Cady Heron</h4>
-								<p>Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat.</p>
-								<hr />
-								<h4><img src="http://placehold.it/30x30"> Trang Pak</h4>
-								<p>Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat.</p>
-								<hr />
-								<h4><img src="http://placehold.it/30x30"> Cady Heron</h4>
-								<p>Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat.</p>
-								<hr />
+							</div>
+							<div class="grid-content" ng-hide="group.passwords.length">
+								<h1>There are no passwords in this group yet.</h1>
+								<h3>Use the button up above to add one</h3>
+							</div>
+						</div>
+						<div class="grid-block small-12 medium-12 vertical" ng-hide="group">
+							<div class="grid-content">
+								<h1>Select a password group from the left.</h1>
 							</div>
 						</div>
 					</div>
@@ -148,7 +199,7 @@
 									<span class="ion-lock-combination"></span>
 								</span>
 								<input type="password" class="password" id="login-password" ng-model="credentials.password" autofocus>
-								<a href="#" class="button extra-large" ng-class="loading ? 'disabled' : ''">Unlock</a>
+								<button type="submit" class="button extra-large" id="unlock-button" ng-class="loading ? 'disabled' : ''">Unlock</a>
 							</span>
 							<p class="alert" ng-show="error" ng-bind="error"></p>
 						</label>

@@ -30,6 +30,10 @@ angular.module('PassHuman.controllers', ['PassHuman.services'])
 		$scope.$apply();
 	});
 
+	$scope.setActiveGroup = function(group) {
+		$rootScope.$emit('SET_ACTIVE_GROUP', group);
+	};
+
 })
 .controller('RegisterCtrl', function($scope, $rootScope, Home, Public, Private) {
 	var path = require('path');
@@ -141,6 +145,13 @@ angular.module('PassHuman.controllers', ['PassHuman.services'])
 
 	$scope.generate = function() {
 		$scope.group.password = PasswordGenerator.generate(20);
+	};
+
+	$scope.cancel = function() {
+		$rootScope.$emit(
+			'SET_PANEL_VISIBILITY',
+			{name: 'addPasswordGroup', visible: false}
+		);
 	};
 
 	$scope.create = function(group) {
@@ -281,6 +292,14 @@ angular.module('PassHuman.controllers', ['PassHuman.services'])
 		}
 	});
 })
+.controller('AddPasswordCtrl', function($scope, $rootScope) {
+	$scope.cancel = function() {
+		$rootScope.$emit(
+			'SET_PANEL_VISIBILITY',
+			{name: 'addPassword', visible: false}
+		);
+	};
+})
 .controller('LeftFooterCtrl', function($scope, $rootScope) {
 	var mainWindow = require('nw.gui').Window.get();
 	$scope.togglePanel = function(panelName) {
@@ -292,19 +311,37 @@ angular.module('PassHuman.controllers', ['PassHuman.services'])
 })
 .controller('PanelsCtrl', function($scope, $rootScope) {
 	$scope.panels = {
-		'addPasswordGroup': ''
+		'addPasswordGroup': '',
+		'addPassword': ''
 	}
 	$rootScope.$on('TOGGLE_PANEL', function(e, panelName) {
 		if(!$scope.panels.hasOwnProperty(panelName)) return;
 		$scope.panels[panelName] = $scope.panels[panelName] ? '' : 'is-active';
-		console.log($scope.panels[panelName]);
-		$scope.$apply();
 	});
 
 	$rootScope.$on('SET_PANEL_VISIBILITY', function(e, obj) {
-		console.log('SET_PANEL_VISIBILITY')
 		if(!$scope.panels.hasOwnProperty(obj.name)) return;
 		$scope.panels[obj.name] = obj.visible ? 'is-active' : '';
-		$scope.$apply();
+	});
+})
+.controller('PasswordGroupCtrl', function($scope, $rootScope, PasswordGroup) {
+	$scope.passwords = [];
+	$scope.group = false;
+	$scope.addPassword = function() {
+		console.log('addPassword');
+		$rootScope.$emit(
+			'SET_PANEL_VISIBILITY',
+			{name: 'addPassword', visible: true}
+		);
+	};
+
+
+	$rootScope.$on('SET_ACTIVE_GROUP', function(e, group) {
+		$scope.group = group;
+		var pg = new PasswordGroup(group);
+		pg.load(function(err) {
+			if(err) throw err;
+			$scope.group.passwords = pg.getPasswords();
+		});
 	});
 });

@@ -33,7 +33,7 @@ $ionicons-font-path: '../../bower_components/ionicons/fonts';
 	top: 0;
 }
 
-.add-password-group {
+.add-password-group, .add-password {
 	height: 400px;
 	top: -400px;
 }
@@ -75,4 +75,8 @@ $ionicons-font-path: '../../bower_components/ionicons/fonts';
 	color: #999;
 	font-size: 13px;
 	margin-top: 3px;
+}
+
+#unlock-button {
+	margin: 0;
 }
