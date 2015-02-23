@@ -1,33 +1,27 @@
-angular.module('PassHuman.controllers', ['PassHuman.services'])
+angular.module('PassHuman.controllers', ['PassHuman.services', 'cfp.hotkeys'])
 .controller('PassHumanCtrl', function($scope, $rootScope, Public, Private) {
 	$scope.page = 'login';
 	$scope.groups = [];
-	$scope.activeGroup = null;
+	$scope.activeGroupHash = null;
 	if(!Public.settings) {
 		$scope.page = 'register';
 	}
 	else {
-		console.log('focus');
-		console.log($('#login-password'));
 		$('#login-password').focus();
 	}
 	$scope.error = Public.error;
 
 	$rootScope.$on('LOGIN', function() {
-		console.log('on LOGIN');
 		$scope.page = 'private';
 		$scope.$apply();
 	});
 
 	$rootScope.$on('PRIVATE.LOAD', function() {
-		console.log('PRIVATE.LOAD');
 		$scope.groups = Private.getGroups();
-		console.log($scope.groups);
 		$scope.$apply();
 	});
 
 	$rootScope.$on('PRIVATE.CHANGE', function() {
-		console.log('PRIVATE.CHANGE');
 		$scope.groups = Private.getGroups();
 		$scope.$apply();
 	});
@@ -70,7 +64,6 @@ angular.module('PassHuman.controllers', ['PassHuman.services'])
 
 		async.series([
 			function(cb) {
-				console.log(1);
 				Public.save(rd.path, function(err) {
 					if(err) {
 						$scope.error = err.message;
@@ -83,7 +76,6 @@ angular.module('PassHuman.controllers', ['PassHuman.services'])
 				});
 			},
 			function(cb) {
-				console.log(2);
 				Private.setPassword(rd.password);
 				Private.load(function(err) {
 					if(err.code !== 'ENOENT') return cb(err);
@@ -91,18 +83,14 @@ angular.module('PassHuman.controllers', ['PassHuman.services'])
 				});
 			},
 			function(cb) {
-				console.log(3);
 				Private.save(cb);
 			}
 		], function(err) {
-			console.log(4);
 			if(err) {
-				console.log(err);
 				$scope.error = err.message;
 				$scope.$apply();
 			}
 			else {
-				console.log('LOGIN!');
 				$rootScope.$emit('LOGIN');
 			}
 		});
@@ -116,7 +104,6 @@ angular.module('PassHuman.controllers', ['PassHuman.services'])
 	$scope.error = '';
 
 	$scope.login = function(credentials) {
-		console.log('login')
 		$scope.error = '';
 		Private.setPassword(credentials.password);
 		Private.load(function(err) {
@@ -175,7 +162,6 @@ angular.module('PassHuman.controllers', ['PassHuman.services'])
 		async.waterfall([
 			function(cb) {
 				fs.access(passGroup.getPath(), fs.F_OK, function(err) {
-					console.log('fs.access', arguments);
 					if(err && err.code === 'ENOENT') {
 						return cb(null, false);
 					}
@@ -257,7 +243,6 @@ angular.module('PassHuman.controllers', ['PassHuman.services'])
 		else {
 			var passGroup = new PasswordGroup($scope.group);
 			passGroup.load(function(err) {
-				console.log(err.code);
 				$scope.pathMessageClass = 'success';
 				if(err) {
 					switch(err.code) {
@@ -354,17 +339,44 @@ angular.module('PassHuman.controllers', ['PassHuman.services'])
 		$scope.panels[obj.name] = obj.visible ? 'is-active' : '';
 	});
 })
-.controller('PasswordGroupCtrl', function($scope, $rootScope, PasswordGroup, Logger) {
+.controller('PasswordGroupCtrl', function($scope, $rootScope, $timeout, PasswordGroup, Logger, hotkeys) {
 	$scope.group = false;
+	$scope.searchActive = false;
+	$scope.searchQuery = '';
 
 	var passwordGroup = false;
 	$scope.addPassword = function() {
-		console.log('addPassword');
 		$rootScope.$emit(
 			'SET_PANEL_VISIBILITY',
 			{name: 'addPassword', visible: true}
 		);
 	};
+
+	$scope.checkEsc = function(e) {
+		if(e.keyCode == 27) {
+			$scope.searchActive = false;
+			$scope.searchQuery = '';
+		}
+	};
+
+	hotkeys.add({
+		combo: 'ctrl+f',
+		description: 'Search for a password',
+		callback: function() {
+			$scope.searchActive = true;
+			$timeout(function() {
+				$('#password-search').focus();
+			}, 10);
+		}
+	});
+
+	hotkeys.add({
+		combo: 'esc',
+		description: 'Search for a password',
+		callback: function() {
+			$scope.searchActive = false;
+		}
+	});
 
 	$rootScope.$on('SET_ACTIVE_GROUP', function(e, group) {
 		$scope.group = group;
@@ -372,7 +384,6 @@ angular.module('PassHuman.controllers', ['PassHuman.services'])
 		passwordGroup.load(function(err) {
 			if(err) throw err;
 			$scope.group.passwords = passwordGroup.getPasswords();
-			console.log($scope.group.passwords);
 			$scope.$apply();
 		});
 	});

@@ -1,5 +1,8 @@
 angular.module('PassHuman.filters', [])
-.filter('DisplayPassword', function(password) {
-	console.log(password);
-	return 'test';
+.filter('visible', function() {
+	// console.log(passwords);
+	// return passwords;
+	return function(password) {
+		return password.visible;
+	}
 });

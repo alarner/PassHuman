@@ -10,6 +10,7 @@
 		<script type="text/javascript" src="bower_components/async/lib/async.js"></script>
 		<script type="text/javascript" src="bower_components/lodash/lodash.min.js"></script>
 		<script type="text/javascript" src="bower_components/validator-js/validator.min.js"></script>
+		<script type="text/javascript" src="bower_components/angular-hotkeys/build/hotkeys.min.js"></script>
 
 		<script type="text/javascript" src="scripts/controllers.js"></script>
 		<script type="text/javascript" src="scripts/filters.js"></script>
@@ -168,11 +169,17 @@
 									<span class="title left" ng-bind="group.name"></span>
 									<span class="right"><a href="#" ng-click="addPassword()"><span class="ion-android-add-circle"></span> Add Password</a></span>
 								</div>
+								<div class="title-bar search" ng-show="searchActive">
+									<span class="inline-label">
+										<input type="search" placeholder="Search Passwords..." id="password-search" ng-keydown="checkEsc($event)" ng-model="searchQuery">
+										<a href="#" class="button"><span class="ion-ios-search-strong"></span></a>
+									</span>
+								</div>
 							</div>
 							<div class="grid-content" ng-show="group.passwords.length">
 								<section class="block-list">
 									<ul>
-										<li ng-repeat="password in group.passwords track by $index">
+										<li ng-repeat="password in group.passwords | filter:searchQuery track by $index">
 											<a href="#">
 												<div>{{ password.label() }}</div>
 												<div class="group-path">{{ password.subLabel() }}</div>

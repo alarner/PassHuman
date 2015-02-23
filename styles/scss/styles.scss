@@ -96,3 +96,14 @@ $ionicons-font-path: '../../bower_components/ionicons/fonts';
 #unlock-button {
 	margin: 0;
 }
+
+.search {
+	.inline-label {
+		margin-bottom: 0;
+		width: 100%
+	}
+
+	.ion-ios-search-strong {
+		font-size: 26px;
+	}
+}
