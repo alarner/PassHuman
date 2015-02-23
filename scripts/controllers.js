@@ -1,6 +1,8 @@
 angular.module('PassHuman.controllers', ['PassHuman.services'])
 .controller('PassHumanCtrl', function($scope, $rootScope, Public, Private) {
 	$scope.page = 'login';
+	$scope.groups = [];
+	$scope.activeGroup = null;
 	if(!Public.settings) {
 		$scope.page = 'register';
 	}
@@ -31,6 +33,7 @@ angular.module('PassHuman.controllers', ['PassHuman.services'])
 	});
 
 	$scope.setActiveGroup = function(group) {
+		$scope.activeGroupHash = group.$$hashKey;
 		$rootScope.$emit('SET_ACTIVE_GROUP', group);
 	};
 
@@ -292,8 +295,35 @@ angular.module('PassHuman.controllers', ['PassHuman.services'])
 		}
 	});
 })
-.controller('AddPasswordCtrl', function($scope, $rootScope) {
+.controller('AddPasswordCtrl', function($scope, $rootScope, PasswordGenerator, PasswordValidator) {
+	$scope.password = {};
+
 	$scope.cancel = function() {
+		$rootScope.$emit(
+			'SET_PANEL_VISIBILITY',
+			{name: 'addPassword', visible: false}
+		);
+	};
+
+	$scope.generate = function() {
+		$scope.password.password = PasswordGenerator.generate(20);
+	};
+
+	$scope.$watch('password.domain', function() {
+		if(!$scope.password.domain) return;
+		if($scope.password.domain.substring(0, 7).toLowerCase() === 'http://') {
+			$scope.password.domain = $scope.password.domain.substring(7);
+		}
+		if($scope.password.domain.substring(0, 8).toLowerCase() === 'https://') {
+			$scope.password.domain = $scope.password.domain.substring(8);
+		}
+	});
+
+	$scope.create = function(password) {
+		$scope.error = PasswordValidator.getError(password);
+		if($scope.error) return;
+
+		$rootScope.$emit('ADD_PASSWORD', password);
 		$rootScope.$emit(
 			'SET_PANEL_VISIBILITY',
 			{name: 'addPassword', visible: false}
@@ -324,9 +354,10 @@ angular.module('PassHuman.controllers', ['PassHuman.services'])
 		$scope.panels[obj.name] = obj.visible ? 'is-active' : '';
 	});
 })
-.controller('PasswordGroupCtrl', function($scope, $rootScope, PasswordGroup) {
-	$scope.passwords = [];
+.controller('PasswordGroupCtrl', function($scope, $rootScope, PasswordGroup, Logger) {
 	$scope.group = false;
+
+	var passwordGroup = false;
 	$scope.addPassword = function() {
 		console.log('addPassword');
 		$rootScope.$emit(
@@ -335,13 +366,28 @@ angular.module('PassHuman.controllers', ['PassHuman.services'])
 		);
 	};
 
-
 	$rootScope.$on('SET_ACTIVE_GROUP', function(e, group) {
 		$scope.group = group;
-		var pg = new PasswordGroup(group);
-		pg.load(function(err) {
+		passwordGroup = new PasswordGroup(group);
+		passwordGroup.load(function(err) {
 			if(err) throw err;
-			$scope.group.passwords = pg.getPasswords();
+			$scope.group.passwords = passwordGroup.getPasswords();
+			console.log($scope.group.passwords);
+			$scope.$apply();
 		});
+	});
+
+	$rootScope.$on('ADD_PASSWORD', function(e, password) {		
+		if(!passwordGroup) return Logger.log('Trying to add password when no group was selected.');
+
+		passwordGroup.addPassword(password, function(err) {
+			if(err) return Logger.error(err);
+			passwordGroup.load(function(err) {
+				if(err) return Logger.error(err);
+				$scope.group.passwords = passwordGroup.getPasswords();
+				$scope.$apply();
+			});
+		});
+
 	});
 });

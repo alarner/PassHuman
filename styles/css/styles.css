@@ -8101,6 +8101,11 @@ blockquote p {
 .avatar-section {
   border-top: 1px solid #eee; }
 
+#sidebar .active {
+  background: #cbcbcb; }
+  #sidebar .active .group-path {
+    color: #232323; }
+
 .menu-bar > li > a > div {
   font-size: 2em;
   margin-bottom: 0.2em; }
@@ -8118,6 +8123,9 @@ blockquote p {
 .add-password-group, .add-password {
   height: 400px;
   top: -400px; }
+
+.add-password .notes {
+  height: 110px; }
 
 .menu-bar li a {
   font-size: 0.7rem;
@@ -8143,6 +8151,7 @@ blockquote p {
   text-overflow: ellipsis;
   color: #999;
   font-size: 13px;
+  line-height: 14px;
   margin-top: 3px; }
 
 #unlock-button {

@@ -16,6 +16,14 @@ $ionicons-font-path: '../../bower_components/ionicons/fonts';
 .message-side-bar {border-left: 1px solid #eee;}
 .avatar-section {border-top: 1px solid #eee;}
 
+#sidebar .active {
+	background: $gray-dark;
+
+	.group-path {
+		color: $dark-color;
+	}
+}
+
 .menu-bar > li > a > div {
 	font-size: 2em;
 	margin-bottom: 0.2em;
@@ -37,6 +45,13 @@ $ionicons-font-path: '../../bower_components/ionicons/fonts';
 	height: 400px;
 	top: -400px;
 }
+
+.add-password {
+	.notes {
+		height: 110px;
+	}
+}
+
 .menu-bar {
 	li {
 		a {
@@ -74,6 +89,7 @@ $ionicons-font-path: '../../bower_components/ionicons/fonts';
 	text-overflow: ellipsis;
 	color: #999;
 	font-size: 13px;
+	line-height: 14px;
 	margin-top: 3px;
 }
 

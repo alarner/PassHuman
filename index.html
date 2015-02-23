@@ -3,14 +3,16 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Foundation Angular</title>
+		<title>PassHuman - Password management for humans</title>
 		<link href="styles/css/styles.css" rel="stylesheet" type="text/css">
 		<script type="text/javascript" src="bower_components/angular/angular.min.js"></script>
 		<script type="text/javascript" src="bower_components/jquery/dist/jquery.min.js"></script>
 		<script type="text/javascript" src="bower_components/async/lib/async.js"></script>
 		<script type="text/javascript" src="bower_components/lodash/lodash.min.js"></script>
+		<script type="text/javascript" src="bower_components/validator-js/validator.min.js"></script>
 
 		<script type="text/javascript" src="scripts/controllers.js"></script>
+		<script type="text/javascript" src="scripts/filters.js"></script>
 		<script type="text/javascript" src="scripts/services.js"></script>
 		<script type="text/javascript" src="scripts/app.js"></script>
 	</head>
@@ -86,22 +88,21 @@
 							<div class="grid-content">
 								<form>
 									<label>
-										Title
-										<input type="text" placeholder="eg. Personal Email" ng-model="password.title">
-									</label>
-									<label>
-										Domain
-										<input type="url" placeholder="eg. http://accounts.google.com" ng-model="password.domain">
-									</label>
-									<label>
 										Username
-										<input type="text" placeholder="eg. Work Passwords" ng-model="password.username">
+										<input type="text" placeholder="eg. your.email@example.com" ng-model="password.username">
 									</label>
 									<label>
 										Password
 										<span class="inline-label">
 											<input type="text" ng-model="password.password">
 											<a href="#" class="button" ng-click="generate()">Generate</a>
+										</span>
+									</label>
+									<label>
+										Domain
+										<span class="inline-label">
+											<span class="form-label">http://</span>
+											<input type="text" placeholder="accounts.google.com" ng-model="password.domain">
 										</span>
 									</label>
 								</form>
@@ -111,8 +112,12 @@
 							<div class="grid-content">
 								<form>
 									<label>
+										Title
+										<input type="text" placeholder="eg. Personal Email" ng-model="password.title">
+									</label>
+									<label>
 										Notes
-										<textarea placeholder="eg. Secret answer: puppies"></textarea>
+										<textarea placeholder="eg. Secret answer: puppies" class="notes"></textarea>
 									</label>
 								</form>
 							</div>
@@ -122,7 +127,7 @@
 						<div class="grid-block medium-12 large-8">
 							<div class="grid-content">
 								<a href="#" class="button secondary" ng-click="cancel()" ng-class="saving ? 'disabled' : ''">Cancel</a>
-								<a href="#" class="button add-button" ng-click="create(group)" ng-class="saving ? 'disabled' : ''">Save Password</a>
+								<a href="#" class="button add-button" ng-click="create(password)" ng-class="saving ? 'disabled' : ''">Save Password</a>
 							</div>
 							<div class="grid-content">
 								<p class="alert" ng-show="error" ng-bind="error"></p>
@@ -138,7 +143,7 @@
 							<header>Password Groups</header>
 							<ul>
 								<li ng-repeat="group in groups track by $index">
-									<a href="#" ng-click="setActiveGroup(group)">
+									<a href="#" ng-click="setActiveGroup(group)" ng-class="activeGroupHash === group.$$hashKey ? 'active' : ''">
 										<div>{{ group.name }}</div>
 										<div class="group-path" ng-bind="group.path"></div>
 									</a>
@@ -165,15 +170,16 @@
 								</div>
 							</div>
 							<div class="grid-content" ng-show="group.passwords.length">
-								<h4><img src="http://placehold.it/30x30"> Cady Heron</h4>
-								<p>Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat nisl ut dapibus. Mauris iaculis porttitor posuere. Praesent id metus massa, ut blandit odio. Proin quis tortor orci. Etiam at risus et justo dignissim congue.</p>
-								<hr />
-								<h4><img src="http://placehold.it/30x30"> Cady Heron</h4>
-								<p>Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat nisl ut dapibus. Mauris iaculis porttitor posuere. Praesent id metus massa, ut blandit odio. Proin quis tortor orci. Etiam at risus et justo dignissim congue.</p>
-								<hr />
-								<h4><img src="http://placehold.it/30x30"> Cady Heron</h4>
-								<p>Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat nisl ut dapibus. Mauris iaculis porttitor posuere. Praesent id metus massa, ut blandit odio. Proin quis tortor orci. Etiam at risus et justo dignissim congue.</p>
-								<hr />
+								<section class="block-list">
+									<ul>
+										<li ng-repeat="password in group.passwords track by $index">
+											<a href="#">
+												<div>{{ password.label() }}</div>
+												<div class="group-path">{{ password.subLabel() }}</div>
+											</a>
+										</li>
+									</ul>
+								</section>
 							</div>
 							<div class="grid-content" ng-hide="group.passwords.length">
 								<h1>There are no passwords in this group yet.</h1>

@@ -2,7 +2,7 @@ angular.module('PassHuman.services', [])
 .factory('Home', function() {
 	return process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
 })
-.factory('PasswordGroup', function(Home) {
+.factory('PasswordGroup', function(Home, PasswordValidator, Password) {
 	return function(obj) {
 		var fs = require('fs-extra');
 		var crypto = require('crypto');
@@ -48,6 +48,22 @@ angular.module('PassHuman.services', [])
 			if(!settings.name) return errors.NONAME;
 			if(!settings.password) return errors.NOPASS;
 			return false;
+		};
+
+		this.addPassword = function(password, cb) {
+			var err = PasswordValidator.getError(password);
+			if(err) return cb(err);
+
+			self.load(function(err) {
+				if(err) return cb(err);
+				var p = new Password(password);
+				passwords.push(p);
+
+				self.save(function(err) {
+					if(err) return cb(err);
+					cb();
+				})
+			});
 		};
 
 		this.save = function(cb) {
@@ -96,15 +112,48 @@ angular.module('PassHuman.services', [])
 					dec += decipher.final('utf8');
 					var result = JSON.parse(dec);
 					if(!result) return cb(errors.BADPARSE);
-					passwords = result.passwords;
+					passwords = [];
+					for(var i=0; i<result.passwords.length; i++) {
+						passwords.push(new Password(result.passwords[i]));
+					}
+					console.log(passwords);
 					cb();
 				}
 				catch(e) {
+					console.log(e);
 					return cb(errors.DECRYPT);
 				}
 			});
 		};
 	}
+})
+.factory('Password', function() {
+	return function(data) {
+		this.username = null;
+		this.password = null;
+		this.domain = null;
+		this.title = null;
+		this.notes = null;
+		if(_.isObject(data)) {
+			this.username = data.username;
+			this.password = data.password;
+			this.domain = data.domain;
+			this.title = data.title;
+			this.notes = data.notes;
+		}
+
+		this.label = function() {
+			if(this.title) return this.title;
+			return '<unknown title>';
+		};
+
+		this.subLabel = function() {
+			var subLabel = '';
+			if(this.username) subLabel += this.username;
+			if(subLabel && this.domain) subLabel += ' | ' + this.domain;
+			return subLabel;
+		};
+	};
 })
 .factory('PasswordGenerator', function() {
 	return {
@@ -127,6 +176,29 @@ angular.module('PassHuman.services', [])
 				}
 			}
 			return generatedPass;
+		}
+	};
+})
+.factory('PasswordValidator', function() {
+	return {
+		getError: function(password) {
+			if(!password.username)
+				return 'Enter a username.';
+			if(!password.password)
+				return 'Enter a password.';
+			if(password.domain) {
+				if(!validator.isURL(password.domain)) {
+					return 'Invlid domain format.';
+				}
+			}
+			return false;
+		}
+	};
+})
+.factory('Logger', function() {
+	return {
+		error: function(message) {
+			console.log(message);
 		}
 	};
 })
